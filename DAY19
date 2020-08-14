@@ -1,0 +1,39 @@
+**********************************************************************************************************************************
+Add Binary
+
+Solution
+Given two binary strings, return their sum (also a binary string).
+
+The input strings are both non-empty and contains only characters 1 or 0.
+
+Example 1:
+
+Input: a = "11", b = "1"
+Output: "100"
+Example 2:
+
+Input: a = "1010", b = "1011"
+Output: "10101"
+ 
+
+Constraints:
+
+Each string consists only of '0' or '1' characters.
+1 <= a.length, b.length <= 10^4
+Each string is either "0" or doesn't contain any leading zero.
+********************************************************************************************************************************
+
+class Solution {
+public:
+    string addBinary(string a, string b) {
+        if(a.size()>b.size()) swap(a, b); // make sure that length of a is no longer than b
+        int carryover = 0, len1 = a.size(), len2=b.size();
+        for(int i=1;i<=len1 || (carryover && i<=len2) ;i++){
+            carryover += ((i>len1) ? 0 : a[len1-i] - '0') + b[len2-i] - '0';
+            b[len2-i] = carryover%2 + '0';
+            carryover /= 2;
+        }
+        if(carryover) b.insert(0, 1, '1');
+        return b;
+    }
+};
