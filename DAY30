@@ -1,0 +1,141 @@
+****************************************************************************************************************************************
+Word Break II
+
+Solution
+Given a non-empty string s and a dictionary wordDict containing a list of non-empty words, add spaces in s to construct a s
+entence where each word is a valid dictionary word. Return all such possible sentences.
+
+Note:
+
+The same word in the dictionary may be reused multiple times in the segmentation.
+You may assume the dictionary does not contain duplicate words.
+Example 1:
+
+Input:
+s = "catsanddog"
+wordDict = ["cat", "cats", "and", "sand", "dog"]
+Output:
+[
+  "cats and dog",
+  "cat sand dog"
+]
+Example 2:
+
+Input:
+s = "pineapplepenapple"
+wordDict = ["apple", "pen", "applepen", "pine", "pineapple"]
+Output:
+[
+  "pine apple pen apple",
+  "pineapple pen apple",
+  "pine applepen apple"
+]
+Explanation: Note that you are allowed to reuse a dictionary word.
+Example 3:
+
+Input:
+s = "catsandog"
+wordDict = ["cats", "dog", "sand", "and", "cat"]
+Output:
+[]
+
+**************************************************************************************************************************************
+
+class Solution {
+public:
+
+// Trie data structure to store dictionary words.
+struct Node{
+struct Node * arr[26];
+bool flag;
+};
+Node * newNode()
+{
+Node * root = new Node();
+for(int i=0;i<26;i++)
+root->arr[i]=NULL;
+root->flag=false;
+return root;
+}
+Node * root;
+
+void insert(string word) {
+    Node* temp=root;
+    for(int i=0;i<word.size();i++)
+    {
+        if(temp->arr[word[i]-'a']==NULL)
+        {
+            Node * t= newNode();
+            temp->arr[word[i]-'a'] = t;
+        }
+        temp=temp->arr[word[i]-'a'];
+    }
+    temp->flag=true;
+    
+}    
+// Trie ended
+
+// Logic for problem
+
+void fun(string s,int p,vector<string> & v,string str,Node * node,vector<int>& dp,int start)
+{
+    if(p==s.size() && (root==node)){
+        v.push_back(str);
+        dp[start]=true;
+        return ;
+    }
+    if(p==s.size())
+    {
+        dp[start]=false;
+        return ;
+    }
+    
+    if(root==node && dp[p]!=-1 && dp[p]==0)
+        return ;
+    
+    if(node->arr[s[p]-'a']!=NULL){
+        Node* temp=node->arr[s[p]-'a'];
+        str+=s[p];
+        
+        if(temp->flag==true){
+            if(p+1!=s.size())
+            {   
+                int len=v.size();
+                fun(s,p+1,v,str+" ",root,dp,p+1);
+                if(v.size()>len)
+                    dp[p+1]=true;
+                else
+                    dp[p+1]=false;
+            }
+                
+        }
+        
+        if(p+1==s.size() && temp->flag==true)
+            fun(s,p+1,v,str,root,dp,start);
+        
+        fun(s,p+1,v,str,temp,dp,start);
+    
+    }
+    else
+        dp[start]=false;
+    
+}
+
+
+
+vector<string> wordBreak(string s, vector<string>& words) {
+    vector<string> v;
+    if(s=="")
+        return v;
+    
+    root=newNode();
+    for(string s: words)
+        insert(s);
+
+    vector<int> dp(s.size(),-1);
+
+    fun(s,0,v,"",root,dp,0);
+    
+    return v;
+}
+};
